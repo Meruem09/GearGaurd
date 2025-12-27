@@ -1,24 +1,44 @@
-import React, { useState } from 'react';
-
-const mockEquipment = [
-  { id: 1, name: 'CNC Machine 01', team: 'Mechanics' },
-  { id: 2, name: 'Printer 01', team: 'IT Support' },
-];
+import React, { useState, useEffect } from 'react';
 
 const Requests = () => {
   const [requests, setRequests] = useState([]);
-  const [form, setForm] = useState({ type: 'corrective', subject: '', equipmentId: '', team: '', scheduled: '', duration: '' });
+  const [equipment, setEquipment] = useState([]);
+  const [form, setForm] = useState({ type: 'corrective', subject: '', equipment: '', team: '', scheduled: '', duration: '' });
+
+  useEffect(() => {
+    const storedRequests = localStorage.getItem('requests');
+    if (storedRequests) {
+      setRequests(JSON.parse(storedRequests));
+    }
+    const storedEquipment = localStorage.getItem('equipment');
+    if (storedEquipment) {
+      setEquipment(JSON.parse(storedEquipment));
+    } else {
+      const defaultEquipment = [
+        { id: '1', name: 'CNC Machine 01', team: 'Mechanics' },
+        { id: '2', name: 'Printer 01', team: 'IT Support' },
+      ];
+      setEquipment(defaultEquipment);
+      localStorage.setItem('equipment', JSON.stringify(defaultEquipment));
+    }
+  }, []);
+
+  const saveRequests = (newRequests) => {
+    setRequests(newRequests);
+    localStorage.setItem('requests', JSON.stringify(newRequests));
+  };
 
   const handleEquipmentChange = (e) => {
-    const eqId = e.target.value;
-    const eq = mockEquipment.find(e => e.id == eqId);
-    setForm({ ...form, equipmentId: eqId, team: eq ? eq.team : '' });
+    const eqName = e.target.value;
+    const eq = equipment.find(e => e.name == eqName);
+    setForm({ ...form, equipment: eq ? eq.name : '', team: eq ? eq.team : '' });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setRequests([...requests, { ...form, id: Date.now(), stage: 'new' }]);
-    setForm({ type: 'corrective', subject: '', equipmentId: '', team: '', scheduled: '', duration: '' });
+    const newRequest = { ...form, id: Date.now(), stage: 'new', assigned: 'Unassigned' };
+    saveRequests([...requests, newRequest]);
+    setForm({ type: 'corrective', subject: '', equipment: '', team: '', scheduled: '', duration: '' });
   };
 
   return (
@@ -39,9 +59,9 @@ const Requests = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Equipment</label>
-            <select value={form.equipmentId} onChange={handleEquipmentChange} className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <select value={form.equipment} onChange={handleEquipmentChange} className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
               <option value="">Select Equipment</option>
-              {mockEquipment.map(eq => <option key={eq.id} value={eq.id}>{eq.name}</option>)}
+              {equipment.map(eq => <option key={eq.id} value={eq.name}>{eq.name}</option>)}
             </select>
           </div>
           <div>
@@ -66,7 +86,7 @@ const Requests = () => {
             <div key={req.id} className="p-4 bg-white rounded-lg shadow-md border border-gray-200">
               <p className="text-lg font-semibold text-gray-900">{req.subject}</p>
               <p className="text-sm text-gray-600">Type: {req.type} | Stage: {req.stage}</p>
-              <p className="text-sm text-gray-600">Equipment: {mockEquipment.find(e => e.id == req.equipmentId)?.name} | Team: {req.team}</p>
+              <p className="text-sm text-gray-600">Equipment: {req.equipment} | Team: {req.team}</p>
             </div>
           ))}
         </div>

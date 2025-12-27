@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DndContext, closestCenter, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
@@ -24,7 +24,17 @@ const SortableItem = ({ id, children }) => {
 };
 
 const Kanban = () => {
-  const [requests, setRequests] = useState(mockRequests);
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    const storedRequests = localStorage.getItem('requests');
+    if (storedRequests) {
+      setRequests(JSON.parse(storedRequests));
+    } else {
+      setRequests(mockRequests);
+    }
+  }, []);
+
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -37,7 +47,9 @@ const Kanban = () => {
     const overStage = overId;
 
     if (activeRequest.stage !== overStage) {
-      setRequests(requests.map(r => r.id === activeId ? { ...r, stage: overStage } : r));
+      const updatedRequests = requests.map(r => r.id === activeId ? { ...r, stage: overStage } : r);
+      setRequests(updatedRequests);
+      localStorage.setItem('requests', JSON.stringify(updatedRequests));
     }
   };
 
