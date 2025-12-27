@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { DndContext, closestCenter, useDroppable, DragOverlay } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  useDroppable,
+  DragOverlay,
+  pointerWithin,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 const mockRequests = [
@@ -13,95 +24,159 @@ const mockRequests = [
 
 const stages = ['new', 'in_progress', 'repaired', 'scrap'];
 
-const SortableItem = ({ id, children }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-  const style = { transform: CSS.Transform.toString(transform), transition };
+/* ------------------ Sortable Card ------------------ */
+const SortableItem = ({ request }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: request.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    cursor: 'grab',
+  };
+
+  const isOverdue =
+    new Date(request.scheduled) < new Date().setHours(0, 0, 0, 0);
+
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
+      <div
+        className={`p-3 bg-white rounded-md shadow-sm border ${
+          isOverdue ? 'border-l-4 border-red-500' : 'border-gray-200'
+        }`}
+      >
+        <p className="font-medium text-gray-900">{request.subject}</p>
+        <p className="text-sm text-gray-600">{request.equipment}</p>
+
+        <div className="flex items-center gap-2 mt-2">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {request.assigned
+              .split(' ')
+              .map((n) => n[0])
+              .join('')}
+          </div>
+          <span className="text-sm text-gray-700">{request.assigned}</span>
+        </div>
+      </div>
     </div>
   );
 };
 
+/* ------------------ Column ------------------ */
+const Column = ({ stage, requests }) => {
+  const { setNodeRef, isOver } = useDroppable({ id: stage });
+
+  const items = requests.filter((r) => r.stage === stage);
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`w-72 min-h-[500px] p-4 rounded-xl border transition-colors
+        ${isOver ? 'bg-blue-50 border-blue-400' : 'bg-gray-100 border-gray-200'}
+      `}
+    >
+      <h2 className="font-bold mb-4 text-gray-700 uppercase text-sm tracking-wide">
+        {stage.replace('_', ' ')} ({items.length})
+      </h2>
+
+      <SortableContext
+        items={items.map((i) => i.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-3">
+          {items.map((request) => (
+            <SortableItem key={request.id} request={request} />
+          ))}
+        </div>
+      </SortableContext>
+    </div>
+  );
+};
+
+/* ------------------ Kanban ------------------ */
 const Kanban = () => {
   const [requests, setRequests] = useState([]);
   const [activeId, setActiveId] = useState(null);
 
   useEffect(() => {
-    const storedRequests = localStorage.getItem('requests');
-    if (storedRequests) {
-      setRequests(JSON.parse(storedRequests));
-    } else {
-      setRequests(mockRequests);
-    }
+    const saved = localStorage.getItem('requests');
+    setRequests(saved ? JSON.parse(saved) : mockRequests);
   }, []);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
 
   const handleDragStart = (event) => {
     setActiveId(event.active.id);
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
+  const handleDragEnd = ({ active, over }) => {
     setActiveId(null);
     if (!over) return;
-    const activeId = active.id;
-    const overId = over.id;
-    if (activeId === overId) return;
 
-    const activeRequest = requests.find(r => r.id === activeId);
-    const overStage = overId;
+    const activeTask = requests.find((r) => r.id === active.id);
+    if (!activeTask) return;
 
-    if (activeRequest.stage !== overStage) {
-      const updatedRequests = requests.map(r => r.id === activeId ? { ...r, stage: overStage } : r);
-      setRequests(updatedRequests);
-      localStorage.setItem('requests', JSON.stringify(updatedRequests));
+    let newStage = null;
+
+    // Dropped on column
+    if (stages.includes(over.id)) {
+      newStage = over.id;
+    } 
+    // Dropped on another card
+    else {
+      const overTask = requests.find((r) => r.id === over.id);
+      newStage = overTask?.stage;
+    }
+
+    if (newStage && newStage !== activeTask.stage) {
+      const updated = requests.map((r) =>
+        r.id === active.id ? { ...r, stage: newStage } : r
+      );
+      setRequests(updated);
+      localStorage.setItem('requests', JSON.stringify(updated));
     }
   };
 
-  const isOverdue = (scheduled) => new Date(scheduled) < new Date() && new Date(scheduled).toDateString() !== new Date().toDateString();
-
-  const Column = ({ stage }) => {
-    const { setNodeRef } = useDroppable({ id: stage });
-    return (
-      <div ref={setNodeRef} className="w-full lg:w-64 bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-200">
-        <h2 className="font-semibold mb-4 text-gray-900 capitalize">{stage.replace('_', ' ')}</h2>
-        <SortableContext items={requests.filter(r => r.stage === stage).map(r => r.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-3">
-            {requests.filter(r => r.stage === stage).map(request => (
-              <SortableItem key={request.id} id={request.id}>
-                <div className={`p-3 bg-white rounded-md shadow-sm border ${isOverdue(request.scheduled) ? 'border-l-4 border-red-500' : 'border-gray-200'}`}>
-                  <p className="font-medium text-gray-900">{request.subject}</p>
-                  <p className="text-sm text-gray-600">{request.equipment}</p>
-                  <p className="text-sm text-gray-600">Assigned: {request.assigned}</p>
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mt-2">
-                    {request.assigned.split(' ').map(n => n[0]).join('')}
-                  </div>
-                </div>
-              </SortableItem>
-            ))}
-          </div>
-        </SortableContext>
-      </div>
-    );
-  };
+  const activeTask = requests.find((r) => r.id === activeId);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Maintenance Kanban Board</h1>
-      <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 overflow-x-auto">
-          {stages.map(stage => <Column key={stage} stage={stage} />)}
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-8">
+        Maintenance Kanban Board
+      </h1>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={pointerWithin}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex gap-6 overflow-x-auto pb-4">
+          {stages.map((stage) => (
+            <Column key={stage} stage={stage} requests={requests} />
+          ))}
         </div>
+
+        <DragOverlay>
+          {activeTask ? (
+            <div className="w-72 p-3 bg-white rounded-md shadow-lg border border-gray-300">
+              <p className="font-medium">{activeTask.subject}</p>
+              <p className="text-sm text-gray-600">{activeTask.equipment}</p>
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
-      <DragOverlay>
-        {activeId ? (
-          <div className="p-3 bg-white rounded-md shadow-sm border border-gray-200 opacity-90">
-            <p className="font-medium text-gray-900">{requests.find(r => r.id === activeId)?.subject}</p>
-            <p className="text-sm text-gray-600">{requests.find(r => r.id === activeId)?.equipment}</p>
-          </div>
-        ) : null}
-      </DragOverlay>
     </div>
   );
 };
