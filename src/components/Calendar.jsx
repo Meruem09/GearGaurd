@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const mockRequests = [
   { id: 1, subject: 'Preventive Check CNC', equipment: 'CNC Machine 01', scheduled: '2024-12-25', stage: 'new', assigned: 'John Doe' },
@@ -7,6 +8,7 @@ const mockRequests = [
 ];
 
 export default function CalendarView() {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [requests, setRequests] = useState([]);
 
@@ -52,8 +54,8 @@ export default function CalendarView() {
   function getRequestsForDate(date) {
     if (!date) return [];
 
-    const dateString = date.toISOString().split('T')[0];
-    return requests.filter((req) => req.scheduled === dateString);
+    const dateString = date.toLocaleDateString('en-CA');
+    return requests.filter((req) => req.scheduled === dateString && req.type === 'preventive');
   }
 
 
@@ -104,11 +106,17 @@ export default function CalendarView() {
                 return (
                   <div
                     key={index}
-                    className={`min-h-[120px] border rounded-lg p-2 transition-colors ${
+                    className={`min-h-[120px] border rounded-lg p-2 transition-colors cursor-pointer ${
                       date
-                        ? 'bg-white border-gray-200'
+                        ? 'bg-white border-gray-200 hover:bg-gray-50'
                         : 'bg-gray-50 border-gray-100'
                     } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                    onClick={() => {
+                      if (date) {
+                        const dateString = date.toLocaleDateString('en-CA');
+                        navigate('/requests', { state: { scheduled: dateString, type: 'preventive' } });
+                      }
+                    }}
                   >
                     {date && (
                       <>

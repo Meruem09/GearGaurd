@@ -12,7 +12,9 @@ export default function EquipmentList({ onSelectEquipment }) {
       owner_type: 'department',
       owner_name: 'Production',
       location: 'Building A, Floor 2',
-      team: 'Mechanics',
+      maintenance_team_id: '1',
+      default_technician_id: '1',
+      maintenance_teams: { id: '1', name: 'Maintenance Team A' },
       request_count: 2,
       is_scrapped: false,
     },
@@ -24,23 +26,51 @@ export default function EquipmentList({ onSelectEquipment }) {
       owner_type: 'employee',
       owner_name: 'John Doe',
       location: 'Office 101',
-      team: 'IT Support',
+      maintenance_team_id: '2',
+      default_technician_id: '3',
+      maintenance_teams: { id: '2', name: 'Maintenance Team B' },
       request_count: 0,
       is_scrapped: false,
     },
   ];
 
-  const [equipment, setEquipment] = useState([]);
-  const [filteredEquipment, setFilteredEquipment] = useState([]);
+  const [equipment, setEquipment] = useState(defaultEquipment);
+  const [filteredEquipment, setFilteredEquipment] = useState(defaultEquipment);
   const [showForm, setShowForm] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [ownerTypeFilter, setOwnerTypeFilter] = useState('all');
+  const [selectedEquipment, setSelectedEquipment] = useState(null);
+  const [showRequestsModal, setShowRequestsModal] = useState(false);
+  const [requests, setRequests] = useState([]);
 
   useEffect(() => {
     loadEquipment();
+    loadRequests();
   }, []);
+
+  function loadRequests() {
+    const storedRequests = localStorage.getItem('requests');
+    if (storedRequests) {
+      setRequests(JSON.parse(storedRequests));
+    }
+  }
+
+  function updateRequestCounts() {
+    const updatedEquipment = equipment.map(eq => {
+      const openRequests = requests.filter(req =>
+        req.equipment === eq.name && req.stage !== 'repaired' && req.stage !== 'scrap'
+      );
+      return { ...eq, request_count: openRequests.length };
+    });
+    setEquipment(updatedEquipment);
+    localStorage.setItem('equipment', JSON.stringify(updatedEquipment));
+  }
+
+  useEffect(() => {
+    updateRequestCounts();
+  }, [requests]);
 
   useEffect(() => {
     filterEquipment();
@@ -90,6 +120,17 @@ export default function EquipmentList({ onSelectEquipment }) {
     setShowForm(false);
     setEditingEquipment(null);
     loadEquipment();
+  }
+
+  function handleMaintenanceClick(eq) {
+    console.log('Maintenance clicked for equipment:', eq);
+    setSelectedEquipment(eq);
+    setShowRequestsModal(true);
+  }
+
+  function closeRequestsModal() {
+    setShowRequestsModal(false);
+    setSelectedEquipment(null);
   }
 
   return (
@@ -163,10 +204,21 @@ export default function EquipmentList({ onSelectEquipment }) {
                     Scrapped
                   </span>
                 )}
-                {!eq.is_scrapped && eq.request_count > 0 && (
-                  <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">
-                    {eq.request_count} open requests
-                  </span>
+                {!eq.is_scrapped && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMaintenanceClick(eq);
+                    }}
+                    className="relative px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded hover:bg-blue-200 transition-colors"
+                  >
+                    Maintenance
+                    {eq.request_count > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                        {eq.request_count}
+                      </span>
+                    )}
+                  </button>
                 )}
               </div>
 

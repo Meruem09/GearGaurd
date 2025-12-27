@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const Requests = () => {
+  const location = useLocation();
   const [requests, setRequests] = useState([]);
   const [equipment, setEquipment] = useState([]);
   const [form, setForm] = useState({ type: 'corrective', subject: '', equipment: '', team: '', scheduled: '', duration: '' });
@@ -22,6 +24,12 @@ const Requests = () => {
       localStorage.setItem('equipment', JSON.stringify(defaultEquipment));
     }
   }, []);
+
+  useEffect(() => {
+    if (location.state) {
+      setForm(prev => ({ ...prev, ...location.state }));
+    }
+  }, [location.state]);
 
   const saveRequests = (newRequests) => {
     setRequests(newRequests);

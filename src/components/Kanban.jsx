@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DndContext, closestCenter, useDroppable } from '@dnd-kit/core';
+import { DndContext, closestCenter, useDroppable, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -25,6 +25,7 @@ const SortableItem = ({ id, children }) => {
 
 const Kanban = () => {
   const [requests, setRequests] = useState([]);
+  const [activeId, setActiveId] = useState(null);
 
   useEffect(() => {
     const storedRequests = localStorage.getItem('requests');
@@ -36,8 +37,13 @@ const Kanban = () => {
   }, []);
 
 
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
+
   const handleDragEnd = (event) => {
     const { active, over } = event;
+    setActiveId(null);
     if (!over) return;
     const activeId = active.id;
     const overId = over.id;
@@ -83,11 +89,19 @@ const Kanban = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Maintenance Kanban Board</h1>
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 overflow-x-auto">
           {stages.map(stage => <Column key={stage} stage={stage} />)}
         </div>
       </DndContext>
+      <DragOverlay>
+        {activeId ? (
+          <div className="p-3 bg-white rounded-md shadow-sm border border-gray-200 opacity-90">
+            <p className="font-medium text-gray-900">{requests.find(r => r.id === activeId)?.subject}</p>
+            <p className="text-sm text-gray-600">{requests.find(r => r.id === activeId)?.equipment}</p>
+          </div>
+        ) : null}
+      </DragOverlay>
     </div>
   );
 };
