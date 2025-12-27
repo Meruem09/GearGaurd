@@ -80,25 +80,21 @@ The system supports real-world maintenance workflows, ensuring that the right te
 
 ---
 
+
 ## 📸 Screenshots
 
+![Screenshot 2025-12-27 161645](https://github.com/user-attachments/assets/b824d396-04b1-4638-b50d-66f09a2e3041)  <img width="1354" height="634" alt="Screenshot 2025-12-27 161844" src="https://github.com/user-attachments/assets/a71e3a32-6a84-4e27-8985-b2c4c9d9b078" />
+<img width="1063" height="589" alt="Screenshot 2025-12-27 161040" src="https://github.com/user-attachments/assets/9478c6aa-a92e-4195-ac3b-7d88a20016b4" />
+<img width="1351" height="607" alt="Screenshot 2025-12-27 163726" src="https://github.com/user-attachments/assets/38e611dd-6630-4cb3-a603-6186ea22322e" />
+<img width="1352" height="619" alt="Screenshot 2025-12-27 164139" src="https://github.com/user-attachments/assets/34717f13-29d5-4365-8ed9-c497e9ab3d66" />
+<img width="1330" height="615" alt="Screenshot 2025-12-27 164710" src="https://github.com/user-attachments/assets/33554d17-2dce-47ef-9dd9-f164b1227503" />
+<img width="1359" height="602" alt="Screenshot 2025-12-27 164927" src="https://github.com/user-attachments/assets/19f1a2ce-49d2-4fb5-b7d6-688301c9fffe" />
+<img width="1334" height="692" alt="Screenshot 2025-12-27 165305" src="https://github.com/user-attachments/assets/3211f8be-2d6c-44e2-b1e1-610db629ab02" />
+<img width="1076" height="528" alt="Screenshot 2025-12-27 165207" src="https://github.com/user-attachments/assets/8a3f89ff-b6f8-4ce3-b09c-53404e0e7b70" />
 
 
-screenshots
 
 
-Examples:
-
-* Equipment List View
-* Maintenance Kanban Board
-* Preventive Maintenance Calendar
-
-```
-/screenshots
- ├── home.png
- ├── kanban.png
- └── calendar.png
-```
 
 ---
 
