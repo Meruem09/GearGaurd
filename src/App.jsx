@@ -56,7 +56,53 @@ function App() {
               <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
               <Route path="/kanban" element={<ProtectedRoute><Kanban /></ProtectedRoute>} />
               <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-              <Route path="/" element={<ProtectedRoute><div className="p-6"><h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to GearGuard</h1><p className="text-gray-600">Manage your maintenance efficiently.</p></div></ProtectedRoute>} />
+              <Route path="/" element={<ProtectedRoute><div className="p-8">
+                <div className="mb-12">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-3">Welcome to GearGuard</h1>
+                  <p className="text-xl text-gray-600">Your comprehensive equipment maintenance management solution</p>
+                </div>
+
+                <div className="mb-12">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">About GearGuard</h2>
+                  <p className="text-gray-700 leading-relaxed max-w-3xl">
+                    GearGuard is a powerful maintenance management system designed to help organizations efficiently track, manage, and maintain their equipment assets. Whether you're managing machinery, vehicles, computers, or any other equipment, GearGuard provides the tools you need to ensure optimal performance, reduce downtime, and extend equipment lifecycle.
+                  </p>
+                </div>
+
+                <div className="mb-12">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Key Features</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                      <div className="text-blue-600 text-3xl mb-3">📦</div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Equipment Management</h3>
+                      <p className="text-sm text-gray-600">Track all your equipment, serial numbers, locations, and ownership details in one centralized system.</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                      <div className="text-green-600 text-3xl mb-3">👥</div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Team Management</h3>
+                      <p className="text-sm text-gray-600">Organize technicians into teams and assign them to specific equipment for efficient maintenance coordination.</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                      <div className="text-orange-600 text-3xl mb-3">⚙️</div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Maintenance Requests</h3>
+                      <p className="text-sm text-gray-600">Create and track both corrective and preventive maintenance requests with detailed workflows and scheduling.</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                      <div className="text-purple-600 text-3xl mb-3">📅</div>
+                      <h3 className="font-semibold text-gray-900 mb-2">Calendar & Kanban</h3>
+                      <p className="text-sm text-gray-600">Visualize maintenance schedules on a calendar and manage workflow stages on a Kanban board.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-blue-600 p-8 rounded-lg">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">Get Started</h2>
+                  <p className="text-gray-700 mb-4">Ready to manage your first maintenance request?</p>
+                  <Link to="/requests" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Click Here to Send Your First Request →
+                  </Link>
+                </div>
+              </div></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>
