@@ -2,9 +2,12 @@
 **Team Details**
          | Team Member Name    | Email                                |
 | -------------- | ------------------------------------------- |
-| **Varma Rahul(Team Leader)** |  |
-| **Ayush Singh**  |      |
+| **Varma Rahul(Team Leader)** | vrahul.engineer@gmail.com |
+| **Ayush Singh**  |  ayushsingh.as987@gmail.com    |
 | **Yashraj Patel** | patelyashraj1stfame@gmail.com   |
+
+**Team Mentor**
+  Divyesh Vyas(Discord_id = divyesh_vyas)
 ---
 **GearGaurd** is a modern **Maintenance Management & Tracking System** designed to help organizations efficiently manage equipment, maintenance teams, and repair workflows — all from a clean, intuitive interface.
 
@@ -152,22 +155,45 @@ http://localhost:5173
 ## 🏗 Project Structure
 
 ```
-GearGaurd/
+GEARGAURD-MAIN/
 │
-├── public/                # Static public assets
+├── node_modules/                 # Project dependencies (auto-generated)
+│
+├── public/                       # Public static files
+│   └── vite.svg                  # Vite logo
 │
 ├── src/
-│   ├── assets/            # Images, icons, static files
-│   ├── components/        # Reusable React components
-│   ├── pages/             # Page-level components
-│   ├── App.jsx            # Root application component
-│   ├── main.jsx           # Entry point
-│   └── index.css          # Global styles
+│   │
+│   ├── assets/                   # Static assets
+│   │   └── react.svg             # React logo
+│   │
+│   ├── components/               # Application components
+│   │   ├── Calendar.jsx          # Preventive maintenance calendar view
+│   │   ├── Equipment.jsx         # Equipment listing and management
+│   │   ├── EquipmentForm.jsx     # Form to add/edit equipment
+│   │   ├── ForgotPassword.jsx    # Forgot password UI
+│   │   ├── Kanban.jsx            # Maintenance Kanban board
+│   │   ├── Login.jsx             # User login page
+│   │   ├── Requests.jsx          # Maintenance request management
+│   │   ├── Signup.jsx            # User registration page
+│   │   └── Team.jsx              # Maintenance team management
+│   │
+│   ├── App.css                   # App-level styling
+│   ├── App.jsx                   # Root React component
+│   ├── index.css                 # Global styles
+│   ├── main.jsx                  # Application entry point
+│   │
+│   ├── db.js                     # Database / local data configuration
+│   ├── seed.js                   # Initial seed data
+│   └── test-db.js                # Database testing utilities
 │
-├── index.html             # Main HTML file
-├── package.json           # Dependencies & scripts
-├── vite.config.js         # Vite configuration
-└── README.md              # Project documentation
+├── .gitignore                    # Git ignored files
+├── eslint.config.js              # ESLint configuration
+├── package.json                  # Project metadata and scripts
+├── package-lock.json             # Dependency lock file
+├── vite.config.js                # Vite configuration
+└── README.md                     # Project documentation
+
 ```
 
 ---
@@ -219,6 +245,8 @@ Please ensure your code follows project standards.
 Have questions or suggestions?
 
 * **GitHub**: [https://github.com/Meruem09](https://github.com/Meruem09)
+* **GitHub**: [https://github.com/Ayushax](https://github.com/Ayushax)
+* * **GitHub**: [https://github.com/Yashraj-Patel](https://github.com/Yashraj-Patel)
 * **Issues**: Use the GitHub Issues section to report bugs or ideas
 
 ---
